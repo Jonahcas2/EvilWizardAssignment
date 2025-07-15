@@ -24,6 +24,13 @@ class Warrior(Character):
         super().__init__(name, health=140, attack_power=25)  # Boost health and attack power
 
     # Add your power attack method here
+    def big_bonk(self, opponent):
+        pass
+
+
+    # Add your shield block method here
+    def shield_block(self):
+        pass
 
 
 # Mage class (inherits from Character)
@@ -31,7 +38,54 @@ class Mage(Character):
     def __init__(self, name):
         super().__init__(name, health=100, attack_power=35)  # Boost attack power
 
-    # Add your cast spell method here
+    # Add your cast spell method here (modifies attack function to use spells, and a damage tick of 1hp per turn for 3 turns. At which point, text appears that the spell has worn off.)
+    def cast_spell(self, opponent):
+        pass
+
+
+    # Add life steal method here, which allows the Mage to heal for a portion of the damage dealt
+    def life_steal(self, opponent):
+        pass
+
+
+    # Add fireball method here, which allows the Mage to deal a large amount of damage to the opponent, but at the cost of some of their own health
+    def fireball(self, opponent):
+        pass
+
+
+# Archer class (inherits from Character)
+class Archer(Character):
+    def __init__(self, name):
+        super().__init__(name, health=120, attack_power=20)  # Boost health and attack power
+
+    # Add arrow shot method here (allows the Archer to attack from a distance, dealing damage without taking damage in return).The quiver # can hold a limited number of arrows, and the Archer must not attack in order to replenish their arrows.
+    def arrow_shot(self, opponent):
+        pass
+
+
+    # Add quick shot method here (allows the Archer to attack quickly, dealing less damage but not using an arrow from the quiver)
+    def quick_shot(self, opponent):
+        pass
+
+
+    # Add dodge method here (allows the Archer to avoid an attack, reducing damage taken by half for one turn. The Archer must not attack in order to replenish their dodge ability) 
+    def dodge(self):
+        pass
+
+
+# Paladin class (inherits from Character)
+class Paladin(Character):
+    def __init__(self, name):
+        super().__init__(name, health=160, attack_power=15)  # Boost health
+
+    # Add shield block method here
+    def shield_block(self):
+        pass
+
+
+    # Add divine retribution method here (allows the Paladin to reflect a portion of the damage taken back to the attacker, healing themselves for the same amount)
+    def divine_retribution(self, opponent):
+        pass
 
 
 # EvilWizard class (inherits from Character)
@@ -70,6 +124,8 @@ def create_character():
     else:
         print("Invalid choice. Defaulting to Warrior.")
         return Warrior(name)
+    
+
 
 # Battle function with user menu for actions
 def battle(player, wizard):
