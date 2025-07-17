@@ -10,6 +10,7 @@ class Character:
         self.spell_ticks = 0
         self.arrows = 5
         self.can_dodge = True
+        self._was_cursed = False
 
     def attack(self, opponent):
         damage = random.randint(self.attack_power - 5, self.attack_power + 5)
@@ -67,6 +68,7 @@ class Mage(Character):
         damage = self.attack_power
         opponent.health -= damage
         opponent.spell_ticks = 3
+        opponent._was_cursed = True
         print(f"{self.name} casts a spell for {damage} damage!")
         print(f"{opponent.name} is cursed and will take 1 damage for the next 3 turns!")
 
@@ -147,8 +149,8 @@ def create_character():
     print("Choose your character class:")
     print("1. Warrior")
     print("2. Mage")
-    print("3. Archer - Unavailable")  # Add Archer
-    print("4. Paladin - Unavailable")  # Add Paladin
+    print("3. Archer")  # Add Archer
+    print("4. Paladin")  # Add Paladin
     
     class_choice = input("Enter the number of your class choice: ")
     name = input("Enter your character's name: ")
@@ -158,13 +160,9 @@ def create_character():
     elif class_choice == '2':
         return Mage(name)
     elif class_choice == '3':
-        print("Archer class is not implemented yet. please try another class.")
-        # Add Archer class here
-        pass
+        return Archer(name)
     elif class_choice == '4':
-        print("Paladin class is not implemented yet. please try another class.")
-        # Add Paladin class here
-        pass
+        return Paladin(name)
     else:
         print("Invalid choice. Defaulting to Warrior.")
         return Warrior(name)
@@ -256,8 +254,10 @@ def battle(player, wizard):
                 print(f"{character.name} suffers 1 damage from a lingering spell! ({character.spell_ticks} turns left)")
                 if character.health <= 0:
                     print(f"{character.name} has been defeated!")
-            if character.spell_ticks == 0:
+            
+            if character.spell_ticks == 0 and hasattr(character, "_was_cursed") and character._was_cursed:
                 print(f"The spell affecting {character.name} has worn off.")
+                character._was_cursed = False
 
         # Evil Wizard's turn to attack and regenerate
         if wizard.health > 0:
