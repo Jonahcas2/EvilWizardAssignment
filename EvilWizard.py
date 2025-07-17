@@ -1,3 +1,4 @@
+import random
 # Base Character class
 class Character:
     def __init__(self, name, health, attack_power):
@@ -11,10 +12,10 @@ class Character:
         self.can_dodge = True
 
     def attack(self, opponent):
-        damage = self.attack_power
+        damage = random.randint(self.attack_power - 5, self.attack_power + 5)
         if hasattr(opponent, 'shielded') and opponent.shielded:
             damage = damage // 2
-            opponent.shielded - False
+            opponent.shielded = False
             print(f"{opponent.name} blocks the attack! Damage reduced to {damage}.")
 
         opponent.health -= self.attack_power
@@ -172,6 +173,7 @@ def create_character():
 
 # Battle function with user menu for actions
 def battle(player, wizard):
+    turn = 1
     while wizard.health > 0 and player.health > 0:
         print("\n--- Your Turn ---")
         print("1. Attack")
@@ -182,10 +184,62 @@ def battle(player, wizard):
         choice = input("Choose an action: ")
 
         if choice == '1':
-            player.attack(wizard)
+            if isinstance(player, Archer):
+                player.arrow_shot(player, wizard)
+            elif isinstance(player, Mage):
+                player.cast_spell(player, wizard)
+            else:
+                player.attack(wizard)
+
         elif choice == '2':
-            # Call the special ability here
-            pass  # Implement this
+            if isinstance(player, Warrior):
+                print("1. Big Bonk")
+                print("2. Shield Block")
+                ability_choice = input("Choose a Warrior ability: ")
+                if ability_choice == '1':
+                    player.big_bonk(wizard)
+                elif ability_choice == '2':
+                    player.shield_block()
+                else:
+                    print("Invalid choice.")
+            
+            elif isinstance(player, Archer):
+                print("1. Quick Shot")
+                print("2. Dodge")
+                ability_choice = input("Choose an Archer ability: ")
+                if ability_choice == '1':
+                    player.quick_shot(wizard)
+                elif ability_choice == '2':
+                    player.dodge()
+                else:
+                    print("Invalid choice")
+            
+            elif isinstance(player, Mage):
+                print("1. Life Steal")
+                print("2. Fireball")
+                ability_choice = input("Choose a Mage ability: ")
+                if ability_choice == '1':
+                    player.cast_spell(wizard)
+                elif ability_choice == '2':
+                    player.life_steal(wizard)
+                elif ability_choice == '3':
+                    player.fireball(wizard)
+                else:
+                    print("Invalid choice.")
+
+            elif isinstance(player, Paladin):
+                print("1. Shield Block")
+                print("2. Divine Retribution")
+                ability_choice = input("Choose a Paladin ability: ")
+                if ability_choice == '1':
+                    player.shield_block()
+                elif ability_choice == '2':
+                    player.divine_retribution(wizard)
+                else:
+                    print("Invalid choice.")
+            else:
+                print("No special abilities available for this class.")
+
         elif choice == '3':
             # Call the heal method here
             pass  # Implement this
@@ -216,6 +270,8 @@ def battle(player, wizard):
 
     if wizard.health <= 0:
         print(f"The wizard {wizard.name} has been defeated by {player.name}!")
+    
+    turn += 1
 
 # Main function to handle the flow of the game
 def main():
