@@ -5,8 +5,18 @@ class Character:
         self.health = health
         self.attack_power = attack_power
         self.max_health = health  # Store the original health for maximum limit
+        self.shielded = False
+        self.spell_ticks = 0
+        self.arrows = 5
+        self.can_dodge = True
 
     def attack(self, opponent):
+        damage = self.attack_power
+        if hasattr(opponent, 'shielded') and opponent.shielded:
+            damage = damage // 2
+            opponent.shielded - False
+            print(f"{opponent.name} blocks the attack! Damage reduced to {damage}.")
+
         opponent.health -= self.attack_power
         print(f"{self.name} attacks {opponent.name} for {self.attack_power} damage!")
         if opponent.health <= 0:
@@ -18,8 +28,8 @@ class Character:
     # Add your heal method here
     def heal(self):   
         if self.health < self.max_health:
-            amount = (self.max_health / 2) + self.health
-            self.health += amount
+            amount = self.max_health // 2
+            self.health = min(self.health + amount, self.max_health)
             print(f"{self.name} heals for {amount} health! Current health: {self.health}")
         else:
             print(f"{self.name} is already at max health!")
@@ -33,12 +43,17 @@ class Warrior(Character):
 
     # Add your power attack method here
     def big_bonk(self, opponent):
-        pass
+        damage = self.attack_power * 2
+        opponent.health -= damage
+        print(f"{self.name} uses Big Bonk! Deals {damage} damage to {opponent.name}.")
+        if opponent.health <= 0:
+            print(f"{opponent.name} has been defeated!")
 
 
     # Add your shield block method here
     def shield_block(self):
-        pass
+        self.shielded = True
+        print(f"{self.name} is now shielded! Next incoming attack will deal half damage.")
 
 
 # Mage class (inherits from Character)
@@ -48,17 +63,29 @@ class Mage(Character):
 
     # Add your cast spell method here (modifies attack function to use spells, and a damage tick of 1hp per turn for 3 turns. At which point, text appears that the spell has worn off.)
     def cast_spell(self, opponent):
-        pass
+        damage = self.attack_power
+        opponent.health -= damage
+        opponent.spell_ticks = 3
+        print(f"{self.name} casts a spell for {damage} damage!")
+        print(f"{opponent.name} is cursed and will take 1 damage for the next 3 turns!")
 
 
     # Add life steal method here, which allows the Mage to heal for a portion of the damage dealt
     def life_steal(self, opponent):
-        pass
+        damage = self.attack_power
+        opponent.health -= damage
+        heal_amount = damage // 2
+        self.health = min(self.health + heal_amount, self.max_health)
+        print(f"{self.name} drains {heal_amount} health from {opponent.name}!")
 
 
     # Add fireball method here, which allows the Mage to deal a large amount of damage to the opponent, but at the cost of some of their own health
     def fireball(self, opponent):
-        pass
+        damage = self.attack_power * 2
+        self_damage = 10
+        opponent.health -= damage
+        self.health -= self_damage
+        print(f"{self.name} casts Fireball! {opponent.name} takes {damage} damage. {self.name} takes {self_damage} recoil.")
 
 
 # Archer class (inherits from Character)
@@ -68,12 +95,19 @@ class Archer(Character):
 
     # Add arrow shot method here (allows the Archer to attack from a distance, dealing damage without taking damage in return).The quiver # can hold a limited number of arrows, and the Archer must not attack in order to replenish their arrows.
     def arrow_shot(self, opponent):
-        pass
+        if self.arrows > 0:
+            self.arrows -= 1
+            opponent.health -= self.attack_power
+            print(f"{self.name} shoots an arrow for {self.attack_power} damage! {self.arrows} arrows left.")
+        else:
+            print(f"{self.name} has no arrows! Must skip a turn to replenish.")
 
 
     # Add quick shot method here (allows the Archer to attack quickly, dealing less damage but not using an arrow from the quiver)
     def quick_shot(self, opponent):
-        pass
+        damage = self.attack_power // 2
+        opponent.health -= damage
+        print(f"{self.name} uses Quick Shot for {damage} damage!")
 
 
     # Add dodge method here (allows the Archer to avoid an attack, reducing damage taken by half for one turn. The Archer must not attack in order to replenish their dodge ability) 
@@ -88,7 +122,8 @@ class Paladin(Character):
 
     # Add shield block method here
     def shield_block(self):
-        pass
+        self.shielded = True
+        print(f"{self.name} is now shielded! Next incoming attack will deal half damage.")
 
 
     # Add divine retribution method here (allows the Paladin to reflect a portion of the damage taken back to the attacker, healing themselves for the same amount)
@@ -159,6 +194,16 @@ def battle(player, wizard):
         else:
             print("Invalid choice, try again.")
             continue
+        
+        for character in [player, wizard]:
+            if character.spell_ticks > 0:
+                character.health -= 1
+                character.spell_ticks -= 1
+                print(f"{character.name} suffers 1 damage from a lingering spell! ({character.spell_ticks} turns left)")
+                if character.health <= 0:
+                    print(f"{character.name} has been defeated!")
+            if character.spell_ticks == 0:
+                print(f"The spell affecting {character.name} has worn off.")
 
         # Evil Wizard's turn to attack and regenerate
         if wizard.health > 0:
